@@ -1,0 +1,141 @@
+﻿<Window x:Class="View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:View"
+        Style="{StaticResource WindowTemplateNormal}"
+        mc:Ignorable="d"
+        Title="Flex-Sortering"
+        MinHeight="500"
+        MinWidth="650">
+
+
+    <Grid Margin="5,5,5,5"
+          RenderTransformOrigin="0.5,0.5">
+        <Label x:Name="lblMasterData"
+               Content="Stamoplysninger"
+               HorizontalAlignment="Left"
+               Margin="10,13,0,0"
+               VerticalAlignment="Top">
+        </Label>
+        <TextBox x:Name="txtBoxFilePathMasterData"
+                 Height="20"
+                 MaxLength="20"
+                 Margin="133,16,181.2,0"
+                 TextWrapping="Wrap"
+                 Text=""
+                 VerticalAlignment="Top" />
+        <Button x:Name="btnMasterDataFilePathSelect"
+                Content="Vælg fil"
+                HorizontalAlignment="Right"
+                Margin="0,16,118.2,0"
+                VerticalAlignment="Top"
+                Style="{StaticResource ButtonTemplateShort}"
+                Click="BtnMasterDataFilePathSelect_Click"
+                Width="59">
+        </Button>
+        <Label x:Name="lblRouteNumberOffer"
+               Content="Garantivognstilbud"
+               HorizontalAlignment="Left"
+               Margin="10,38,0,0"
+               VerticalAlignment="Top">
+        </Label>
+        <TextBox x:Name="txtBoxFilePathRouteNumberOffer"
+                 Height="20"
+                 Margin="132,40,181.2,0"
+                 TextWrapping="Wrap"
+                 Text=""
+                 VerticalAlignment="Top" />
+        <Button x:Name="btnRouteNumberOfferXlFilePathSelect"
+                Content="Vælg fil"
+                HorizontalAlignment="Right"
+                Margin="0,40,118.2,0"
+                VerticalAlignment="Top"
+                Style="{StaticResource ButtonTemplateShort}"
+                Click="BtnRouteNumberFilePathSelect_Click"
+                Width="59">
+        </Button>
+        <Button x:Name="btnImport"
+                Content="Importer"
+                HorizontalAlignment="Right"
+                Margin="0,16,10.2,0"
+                VerticalAlignment="Top"
+                Style="{StaticResource ButtonTemplateLong}"
+                Click="BtnImport_Click"
+                Width="100">
+        </Button>
+        <Button x:Name="btnStartSelection"
+                Content="Start Udvælgelse"
+                HorizontalAlignment="Right"
+                Margin="0,40,10.2,0"
+                VerticalAlignment="Top"
+                IsEnabled="{Binding ImportDone}"
+                Style="{StaticResource ButtonTemplateLong}"
+                Width="100"
+                Click="BtnStartSelection_Click">
+        </Button>
+        <ListView x:Name="listView"
+                  Margin="10,69,10.2,61.4"
+                  SelectedItem="{Binding outputList}"
+                  SelectedValuePath="RouteID">
+
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Garantivognsnr"
+                                    DisplayMemberBinding="{Binding RouteID}"
+                                    Width="120"></GridViewColumn>
+                    <GridViewColumn Header="Nummer"
+                                    DisplayMemberBinding="{Binding OfferReferenceNumber}"
+                                    Width="80"></GridViewColumn>
+                    <GridViewColumn Header="Navn"
+                                    DisplayMemberBinding="{Binding Contractor.ManagerName}"
+                                    Width="120"></GridViewColumn>
+                    <GridViewColumn Header="BrugerID"
+                                    DisplayMemberBinding="{Binding UserID}"
+                                    Width="120"></GridViewColumn>
+                    <GridViewColumn Header="Virksomhedsnavn"
+                                    DisplayMemberBinding="{Binding Contractor.CompanyName}"
+                                    Width="120"></GridViewColumn>                  
+                    <GridViewColumn Header="Vedståede V. Type 2"
+                                    DisplayMemberBinding="{Binding Contractor.NumberOfType2PledgedVehicles}"
+                                    Width="70"></GridViewColumn>
+                    <GridViewColumn Header="Vedståede V. Type 3"
+                                    DisplayMemberBinding="{Binding Contractor.NumberOfType3PledgedVehicles}"
+                                    Width="70"></GridViewColumn>
+                    <GridViewColumn Header="Vedståede V. Type 5"
+                                    DisplayMemberBinding="{Binding Contractor.NumberOfType5PledgedVehicles}"
+                                    Width="70"></GridViewColumn>
+                    <GridViewColumn Header="Vedståede V. Type 6"
+                                    DisplayMemberBinding="{Binding Contractor.NumberOfType6PledgedVehicles}"
+                                    Width="70"></GridViewColumn>
+                    <GridViewColumn Header="Vedståede V. Type 7"
+                                    DisplayMemberBinding="{Binding Contractor.NumberOfType7PledgedVehicles}"
+                                    Width="70"></GridViewColumn>
+                 
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="btnSaveCall"
+                Content="Udringning"
+                HorizontalAlignment="Right"
+                Margin="0,0,118.2,10.4"
+                Style="{StaticResource ButtonTemplateLong}"
+                Click="btnSaveCall_Click"
+                VerticalAlignment="Bottom">
+        </Button>
+        <Button x:Name="btnSavePublic"
+                Content="Offentliggørelse"
+                HorizontalAlignment="Right"
+                Margin="0,0,10.2,10.4"
+                Style="{StaticResource ButtonTemplateLong}"
+                Click="btnSavePublic_Click"
+                VerticalAlignment="Bottom" />
+        <Label x:Name="lblSaveButtons"
+               Content="Gem som (.csv)"
+               HorizontalAlignment="Right"
+               Margin="0,0,125.2,35.4"
+               VerticalAlignment="Bottom"
+               Width="93" />
+    </Grid>
+</Window>
