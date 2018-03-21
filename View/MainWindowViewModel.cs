@@ -6,51 +6,52 @@ namespace View
 {
     public class MainWindowViewModel
     {
-        IOController iOController;
-        SelectionController selectionController;
-        OpenFileDialog openFileDialog;
+        private readonly IoController _iOController;
+        private readonly SelectionController _selectionController;
+        private OpenFileDialog _openFileDialog;
 
         public bool ImportDone { get; set; }
         public bool SelectionDone { get; set; }
 
         public MainWindowViewModel()
         {
-            iOController = new IOController();
-            selectionController = new SelectionController();
+            _iOController = new IoController();
+            _selectionController = new SelectionController();
             ImportDone = false;
         }
 
         public void ImportCSV(string masterDataFilepath, string routeNumberFilepath)
         {
-            iOController.InitializeImport(masterDataFilepath, routeNumberFilepath);
+            _iOController.InitializeImport(masterDataFilepath, routeNumberFilepath);
         }
 
-        public string ChooseCSVFile()
+        public string ChooseCsvFile()
         {
             string filename = "Ingen fil er valgt";
-            openFileDialog = new OpenFileDialog();
-            openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "CVS filer (*.csv)|*.csv|All files (*.*)|*.*";
-            if (openFileDialog.ShowDialog() == true)
+            _openFileDialog = new OpenFileDialog
             {
-                filename = openFileDialog.FileName;
-                return filename;
-            }
+                Multiselect = false,
+                Filter = "CVS filer (*.csv)|*.csv|All files (*.*)|*.*"
+            };
+            if (_openFileDialog.ShowDialog() != true) return filename;
+            filename = _openFileDialog.FileName;
             return filename;
         }
 
-        public void SaveCSVCallFile()
+        public void SaveCsvCallFile()
         {
             if (SelectionDone == true)
             {
-                SaveFileDialog saveDlg = new SaveFileDialog();
+                SaveFileDialog saveDlg = new SaveFileDialog
+                {
+                    Filter = "CSV filer (*.csv)|*.csv|All files (*.*)|*.*",
+                    InitialDirectory = @"C:\%USERNAME%\"
+                };
 
-                saveDlg.Filter = "CSV filer (*.csv)|*.csv|All files (*.*)|*.*";
-                saveDlg.InitialDirectory = @"C:\%USERNAME%\";
                 saveDlg.ShowDialog();
 
                 string path = saveDlg.FileName;
-                iOController.InitializeExportToCallingList(path);
+                _iOController.InitializeExportToCallingList(path);
                 MessageBox.Show("Filen er gemt.");
             }
             else
@@ -58,19 +59,21 @@ namespace View
                 MessageBox.Show("Du har ikke udvalgt vinderne endnu.. Kør Udvælgelse først!");
             }
         }
-        public void SaveCSVPublishFile()
+        public void SaveCsvPublishFile()
         {
-            if (SelectionDone == true)
+            if (SelectionDone)
             {
-                SaveFileDialog saveDlg = new SaveFileDialog();
+                SaveFileDialog saveDlg = new SaveFileDialog
+                {
+                    Filter = "CSV filer (*.csv)|*.csv|All files (*.*)|*.*",
+                    InitialDirectory = @"C:\%USERNAME%\"
+                };
 
-                saveDlg.Filter = "CSV filer (*.csv)|*.csv|All files (*.*)|*.*";
-                saveDlg.InitialDirectory = @"C:\%USERNAME%\";
                 saveDlg.ShowDialog();
 
                 string path = saveDlg.FileName;
 
-                iOController.InitializeExportToPublishList(path);
+                _iOController.InitializeExportToPublishList(path);
                 MessageBox.Show("Filen er gemt.");
             }
             else
@@ -88,7 +91,7 @@ namespace View
             {
                 MessageBox.Show("Du skal importere filerne først.");
             }
-            selectionController.SelectWinners();
+            _selectionController.SelectWinners();
         }
     }
 }

@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain;
+﻿using Domain;
 
 namespace UnitTest
 {
     public class TestDataContainer
     {
-        ListContainer listContainer = ListContainer.GetInstance();
+        // ReSharper disable once NotAccessedField.Local
+        ListContainer _listContainer;
+
+        public TestDataContainer(ListContainer listContainer)
+        {
+            _listContainer = listContainer;
+        }
 
         public void FillListContainer_HappyPath()
         {

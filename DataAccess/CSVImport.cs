@@ -9,15 +9,15 @@ using System.Threading;
 
 namespace DataAccess
 {
-    public class CSVImport
+    public class CsvImport
     {
         private readonly Encoding _encoding;
-        public List<ContractorOLD> Contractors;
+        public List<ContractorOld> Contractors;
         public List<RouteNumber> RouteNumbers;
         public List<Offer> Offers;
-        public CSVImport()
+        public CsvImport()
         {
-            Contractors = new List<ContractorOLD>();
+            Contractors = new List<ContractorOld>();
             RouteNumbers = new List<RouteNumber>();
             Offers = new List<Offer>();
             _encoding = Encoding.GetEncoding("iso-8859-1");
@@ -25,6 +25,7 @@ namespace DataAccess
         public int TryParseToIntElseZero(string toParse)
         {
             toParse = toParse.Replace(" ", "");
+            // ReSharper disable once UnusedVariable
             bool tryParse = int.TryParse(toParse, out int number);
             return number;
         }
@@ -39,6 +40,7 @@ namespace DataAccess
                 Thread.CurrentThread.CurrentCulture = cultureInformation;
             }
             toParse = toParse.Replace(" ", "");
+            // ReSharper disable once UnusedVariable
             bool tryParse = float.TryParse(toParse.Replace('.', ','), out float number);
             return number;
         }
@@ -60,19 +62,21 @@ namespace DataAccess
                });
                 foreach (Offer o in data)
                 {
+                    // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (o.UserId == "" && o.OperationPrice == 0) continue;
                     o.RouteNumberPriority = TryParseToIntElseZero(o.CreateRouteNumberPriority);
                     o.ContractorPriority = TryParseToIntElseZero(o.CreateContractorPriority);
-                    ContractorOLD contractor = Contractors.Find(x => x.UserID == o.UserId);
+                    ContractorOld contractor = Contractors.Find(x => x.UserId == o.UserId);
                     try
                     {
-                        o.RequiredVehicleType = RouteNumbers.Find(r => r.RouteID == o.RouteId).RequiredVehicleType;
+                        o.RequiredVehicleType = RouteNumbers.Find(r => r.RouteId == o.RouteId).RequiredVehicleType;
                         Offer newOffer = new Offer(o.OfferReferenceNumber, o.OperationPrice, o.RouteId, o.UserId, o.RouteNumberPriority, o.ContractorPriority, contractor, o.RequiredVehicleType);
                         Offers.Add(newOffer);
                     }
                     catch
                     {
                         // Help for debugging purpose only.
+                        // ReSharper disable once UnusedVariable
                         string failure = o.RouteId.ToString();
                     }
                 }
@@ -80,7 +84,7 @@ namespace DataAccess
                 {
                     foreach (Offer offer in Offers)
                     {
-                        if (offer.RouteId == routeNumber.RouteID)
+                        if (offer.RouteId == routeNumber.RouteId)
                         {
                             routeNumber.offers.Add(offer);
                         }
@@ -105,19 +109,19 @@ namespace DataAccess
             try
             {
                 string filepath = Environment.ExpandEnvironmentVariables("RouteNumbers.csv");
-                var data = File.ReadAllLines(filepath, _encoding)
+                IEnumerable<RouteNumber> data = File.ReadAllLines(filepath, _encoding)
                 .Skip(1)
                 .Select(x => x.Split(';'))
                 .Select(x => new RouteNumber
                 {
-                    RouteID = TryParseToIntElseZero(x[0]),
+                    RouteId = TryParseToIntElseZero(x[0]),
                     RequiredVehicleType = TryParseToIntElseZero(x[1]),
                 });
                 foreach (var r in data)
                 {
-                    bool doesAlreadyContain = RouteNumbers.Any(obj => obj.RouteID == r.RouteID);
+                    bool doesAlreadyContain = RouteNumbers.Any(obj => obj.RouteId == r.RouteId);
 
-                    if (!doesAlreadyContain && r.RouteID != 0 && r.RequiredVehicleType != 0)
+                    if (!doesAlreadyContain && r.RouteId != 0 && r.RequiredVehicleType != 0)
                     {
                         RouteNumbers.Add(r);
                     }
@@ -143,15 +147,15 @@ namespace DataAccess
         {
             try
             {
-                IEnumerable<ContractorOLD> data = File.ReadAllLines(filepath, _encoding)
+                IEnumerable<ContractorOld> data = File.ReadAllLines(filepath, _encoding)
                   .Skip(1)
                   .Select(x => x.Split(';'))
-                  .Select(x => new ContractorOLD
+                  .Select(x => new ContractorOld
                   {
                       ReferenceNumberBasicInformationPdf = x[0],
                       ManagerName = x[1],
                       CompanyName = x[2],
-                      UserID = x[3],
+                      UserId = x[3],
                       TryParseValueType2PledgedVehicles = x[4],
                       TryParseValueType3PledgedVehicles = x[5],
                       TryParseValueType5PledgedVehicles = x[6],
@@ -160,9 +164,9 @@ namespace DataAccess
 
                   });
 
-                foreach (ContractorOLD c in data)
+                foreach (ContractorOld c in data)
                 {
-                    if (c.UserID == "") continue;
+                    if (c.UserId == "") continue;
                     {
                         //bool doesAlreadyContain = Contractors.Any(obj => obj.UserID == c.UserID);
 
@@ -172,9 +176,9 @@ namespace DataAccess
                         c.NumberOfType6PledgedVehicles = TryParseToIntElseZero(c.TryParseValueType6PledgedVehicles);
                         c.NumberOfType7PledgedVehicles = TryParseToIntElseZero(c.TryParseValueType7PledgedVehicles);
 
-                        ContractorOLD newContractor = new ContractorOLD(
+                        ContractorOld newContractor = new ContractorOld(
                             c.ReferenceNumberBasicInformationPdf,
-                            c.UserID, c.CompanyName, c.ManagerName,
+                            c.UserId, c.CompanyName, c.ManagerName,
                             c.NumberOfType2PledgedVehicles, c.NumberOfType3PledgedVehicles,
                             c.NumberOfType5PledgedVehicles, c.NumberOfType6PledgedVehicles,
                             c.NumberOfType7PledgedVehicles);
@@ -195,13 +199,5 @@ namespace DataAccess
                 throw new Exception("Fejl, filerne blev ikke importeret");
             }
         }
-        //public List<ContractorOLD> SendContractorListToContainer()
-        //{
-        //    return Contractors;
-        //}
-        //public List<RouteNumber> SendRouteNumberListToContainer()
-        //{
-        //    return RouteNumbers;
-        //}
     }
 }

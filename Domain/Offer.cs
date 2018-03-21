@@ -13,10 +13,10 @@
         public string CreateContractorPriority { get; set; }
         public int RouteNumberPriority { get; set; }
         public int ContractorPriority { get; set; }
-        public ContractorOLD Contractor { get; set; }
+        public ContractorOld Contractor { get; set; }
 
         public Offer() { }
-        public Offer(string referenceNumber, float operationPrice, int routeId, string userId, int routeNumberPriority, int contractorPriority, ContractorOLD contractor, int requiredVehicleType = 0)
+        public Offer(string referenceNumber, float operationPrice, int routeId, string userId, int routeNumberPriority, int contractorPriority, ContractorOld contractor, int requiredVehicleType = 0)
         {
             OfferReferenceNumber = referenceNumber;
             OperationPrice = operationPrice;

@@ -5,12 +5,6 @@ namespace Domain
 {
     public class SortOffers
     {
-        private int _type2;
-        private int _type3;
-        private int _type5;
-        private int _type6;
-        private int _type7;
-
         public List<Offer> WinningOffers;
         public List<Offer> IneligibleOffers;
         public List<Offer> OffersWithConflict;
@@ -87,7 +81,7 @@ namespace Domain
             Contractor c = new Contractor();
             foreach (Offer offer in offers)
             {
-                if (offer.UserId == c.UserID)
+                if (offer.UserId == c.UserId)
                 {
                     switch (offer.RequiredVehicleType)
                     {

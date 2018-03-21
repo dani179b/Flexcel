@@ -5,15 +5,15 @@ namespace Domain
     public sealed class ListContainer
     {
         public List<RouteNumber> RouteNumberList;
-        public List<ContractorOLD> ContractorList;
+        public List<ContractorOld> ContractorList;
         public List<Offer> OutputList;
         public List<Offer> ConflictList;
-        static readonly ListContainer listContainer = new ListContainer();
+        private static readonly ListContainer listContainer = new ListContainer();
 
         private ListContainer()
         {
             RouteNumberList = new List<RouteNumber>();
-            ContractorList = new List<ContractorOLD>();
+            ContractorList = new List<ContractorOld>();
             OutputList = new List<Offer>();
             ConflictList = new List<Offer>();
         }
@@ -22,7 +22,7 @@ namespace Domain
         {
             return listContainer;
         }
-        public void GetLists(List<RouteNumber> routeNumberList, List<ContractorOLD> contractorList)
+        public void GetLists(List<RouteNumber> routeNumberList, List<ContractorOld> contractorList)
         {
             RouteNumberList = routeNumberList;
             ContractorList = contractorList;

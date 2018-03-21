@@ -7,91 +7,89 @@ namespace Logic
 {
     public class Selection
     {
-        List<Offer> winningOffers = new List<Offer>();
-        ListContainer listContainer = ListContainer.GetInstance();
+        private readonly List<Offer> _winningOffers = new List<Offer>();
+        private readonly ListContainer _listContainer = ListContainer.GetInstance();
 
         public void CalculateOperationPriceDifferenceForOffers(List<RouteNumber> sortedRouteNumberList)
         {
             const int lastOptionValue = int.MaxValue;
             foreach (RouteNumber routeNumber in sortedRouteNumberList)
             {
-                if (routeNumber.offers.Count == 0)
+                switch (routeNumber.offers.Count)
                 {
-                    throw new Exception("Der er ingen bud på garantivognsnummer " + routeNumber.RouteID);
-                }
-                else if (routeNumber.offers.Count == 1)
-                {
-                    routeNumber.offers[0].DifferenceToNextOffer = lastOptionValue;
-                }
-                else if (routeNumber.offers.Count == 2)
-                {
-                    if (routeNumber.offers[0].OperationPrice == routeNumber.offers[1].OperationPrice)
-                    {
+                    case 0:
+                        throw new Exception("Der er ingen bud på garantivognsnummer " + routeNumber.RouteId);
+                    case 1:
                         routeNumber.offers[0].DifferenceToNextOffer = lastOptionValue;
-                        routeNumber.offers[1].DifferenceToNextOffer = lastOptionValue;
-                    }
-                    else
-                    {
-                        routeNumber.offers[0].DifferenceToNextOffer = routeNumber.offers[1].OperationPrice - routeNumber.offers[0].OperationPrice;
-                        routeNumber.offers[1].DifferenceToNextOffer = lastOptionValue;
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < (routeNumber.offers.Count()) - 1; i++)
-                    {
-                        float difference = 0;
-                        int j = i + 1;
-                        if (routeNumber.offers[i].OperationPrice != routeNumber.offers[(routeNumber.offers.Count()) - 1].OperationPrice)
+                        break;
+                    case 2:
+                        // ReSharper disable once CompareOfFloatsByEqualityOperator
+                        if (routeNumber.offers[0].OperationPrice == routeNumber.offers[1].OperationPrice)
                         {
-                            while (difference == 0 && j <= (routeNumber.offers.Count()) - 1)
-                            {
-                                difference = routeNumber.offers[j].OperationPrice - routeNumber.offers[i].OperationPrice;
-                                j++;
-                            }
+                            routeNumber.offers[0].DifferenceToNextOffer = lastOptionValue;
+                            routeNumber.offers[1].DifferenceToNextOffer = lastOptionValue;
                         }
                         else
                         {
-                            while (i < (routeNumber.offers.Count()) - 1)
-                            {
-                                routeNumber.offers[i].DifferenceToNextOffer = lastOptionValue;
-                                i++;
-                            }
+                            routeNumber.offers[0].DifferenceToNextOffer = routeNumber.offers[1].OperationPrice - routeNumber.offers[0].OperationPrice;
+                            routeNumber.offers[1].DifferenceToNextOffer = lastOptionValue;
                         }
-                        routeNumber.offers[i].DifferenceToNextOffer = difference;
-                    }
-                    routeNumber.offers[(routeNumber.offers.Count()) - 1].DifferenceToNextOffer = lastOptionValue;
-
+                        break;
+                    default:
+                        for (int i = 0; i < (routeNumber.offers.Count()) - 1; i++)
+                        {
+                            float difference = 0;
+                            int j = i + 1;
+                            // ReSharper disable once CompareOfFloatsByEqualityOperator
+                            if (routeNumber.offers[i].OperationPrice != routeNumber.offers[(routeNumber.offers.Count()) - 1].OperationPrice)
+                            {
+                                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                                while (difference == 0 && j <= (routeNumber.offers.Count()) - 1)
+                                {
+                                    difference = routeNumber.offers[j].OperationPrice - routeNumber.offers[i].OperationPrice;
+                                    j++;
+                                }
+                            }
+                            else
+                            {
+                                while (i < (routeNumber.offers.Count()) - 1)
+                                {
+                                    routeNumber.offers[i].DifferenceToNextOffer = lastOptionValue;
+                                    i++;
+                                }
+                            }
+                            routeNumber.offers[i].DifferenceToNextOffer = difference;
+                        }
+                        routeNumber.offers[(routeNumber.offers.Count()) - 1].DifferenceToNextOffer = lastOptionValue;
+                        break;
                 }
             }
         }
         public void CheckIfContractorHasWonTooManyRouteNumbers(List<Offer> offersToCheck, List<RouteNumber> sortedRouteNumberList)
         {
-            List<ContractorOLD> contractorsToCheck = new List<ContractorOLD>();
+            List<ContractorOld> contractorsToCheck = new List<ContractorOld>();
             foreach (Offer offer in offersToCheck)
             {
-                foreach (ContractorOLD contractor in listContainer.ContractorList)
+                foreach (ContractorOld contractor in _listContainer.ContractorList)
                 {
-                    if (contractor.UserID.Equals(offer.UserId))
+                    if (contractor.UserId.Equals(offer.UserId))
                     {
-                        if (!contractorsToCheck.Any(obj => obj.UserID.Equals(contractor.UserID)))
+                        if (!contractorsToCheck.Any(obj => obj.UserId.Equals(contractor.UserId)))
                         {
                             contractorsToCheck.Add(contractor);
                         }
                     }
                 }
             }
-            foreach (ContractorOLD contractor in contractorsToCheck)
+            foreach (ContractorOld contractor in contractorsToCheck)
             {
                 List<Offer> offers = contractor.CompareNumberOfWonOffersAgainstVehicles();
-                if (offers.Count > 0)
+                if (offers.Count <= 0) continue;
+                foreach (Offer offer in contractor.CompareNumberOfWonOffersAgainstVehicles())
                 {
-                    foreach (Offer offer in contractor.CompareNumberOfWonOffersAgainstVehicles())
-                    {
-                        listContainer.ConflictList.Add(offer);
-                    }
-                    throw new Exception("Denne entreprenør har vundet flere garantivognsnumre, end de har biler til.  Der kan ikke vælges imellem dem, da de har samme prisforskel ned til næste bud. Prioriter venligst buddene i den relevante fil i kolonnen Entreprenør Prioritet");
+                    _listContainer.ConflictList.Add(offer);
                 }
+                throw new Exception("Denne entreprenør har vundet flere garantivognsnumre, end de har biler til.  Der kan ikke vælges imellem dem, da de har samme prisforskel ned til næste bud. Prioriter venligst buddene i den relevante fil i kolonnen Entreprenør Prioritet");
             }
         }
         public List<Offer> FindWinner(RouteNumber routeNumber)
@@ -108,6 +106,7 @@ namespace Logic
             }
             foreach (Offer offer in routeNumber.offers)
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (offer.IsEligible && offer.OperationPrice == lowestEligibleOperationPrice)
                 {
                     offersWithLowestPrice.Add(offer);
@@ -135,29 +134,27 @@ namespace Logic
                 }
 
                 listOfPriotizedOffers = listOfPriotizedOffers.OrderBy(x => x.RouteNumberPriority).ToList();
-                winningOffers.Add(listOfPriotizedOffers[0]);
+                _winningOffers.Add(listOfPriotizedOffers[0]);
             }
             else
             {
                 foreach (Offer offer in offersWithLowestPrice)
                 {
-                    winningOffers.Add(offer);
+                    _winningOffers.Add(offer);
                 }
             }
-            return winningOffers;
+            return _winningOffers;
         }
         public List<Offer> AssignWinners(List<Offer> offersToAssign, List<RouteNumber> sortedRouteNumberList)
         {
-            List<ContractorOLD> contractorsToCheck = new List<ContractorOLD>();
+            List<ContractorOld> contractorsToCheck = new List<ContractorOld>();
             List<Offer> ineligibleOffersAllContractors = new List<Offer>();
 
             foreach (Offer offer in offersToAssign)
             {
-                if (offer.IsEligible)
-                {
-                    listContainer.ContractorList.Find(x => x.UserID == offer.UserId).AddWonOffer(offer);
-                    contractorsToCheck.Add(offer.Contractor);
-                }
+                if (!offer.IsEligible) continue;
+                _listContainer.ContractorList.Find(x => x.UserId == offer.UserId).AddWonOffer(offer);
+                contractorsToCheck.Add(offer.Contractor);
             }
 
             for (int i = 0; i < contractorsToCheck.Count(); i++)
@@ -182,7 +179,7 @@ namespace Logic
                         {
                             if (offer.RouteId == winnerList[i].RouteId)
                             {
-                                listContainer.ConflictList.Add(offer);
+                                _listContainer.ConflictList.Add(offer);
                             }
                         }
                         throw new Exception("Dette garantivognsnummer har flere mulige vindere. Der kan ikke vælges mellem dem, da de har samme prisforskel ned til næste bud. Prioriter venligst buddene i den relevante fil i kolonnen Garantivognsnummer Prioritet.");

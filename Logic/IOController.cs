@@ -4,36 +4,36 @@ using System.Collections.Generic;
 
 namespace Logic
 {
-    public class IOController
+    public class IoController
     {
-        List<RouteNumber> routeNumberList;
-        List<ContractorOLD> contractorList;
+        private List<RouteNumber> _routeNumberList;
+        private List<ContractorOld> _contractorList;
 
-        public IOController()
+        public IoController()
         {
-            routeNumberList = new List<RouteNumber>();
+            _routeNumberList = new List<RouteNumber>();
         }
 
         public void InitializeExportToPublishList(string filePath)
         {
-            CSVExportToPublishList ExportToPublishList = new CSVExportToPublishList(filePath);
-            ExportToPublishList.CreateFile();
+            CSVExportToPublishList exportToPublishList = new CSVExportToPublishList(filePath);
+            exportToPublishList.CreateFile();
         }
         public void InitializeExportToCallingList(string filePath)
         {
-            CSVExportToCallList ExportCallList = new CSVExportToCallList(filePath);
-            ExportCallList.CreateFile();
+            CSVExportToCallList exportCallList = new CSVExportToCallList(filePath);
+            exportCallList.CreateFile();
         }
         public void InitializeImport(string masterDataFilepath, string routeNumberFilepath)
         {
-            CSVImport csvImport = new CSVImport();
+            CsvImport csvImport = new CsvImport();
             csvImport.ImportContractors(masterDataFilepath);
             csvImport.ImportRouteNumbers();
             csvImport.ImportOffers(routeNumberFilepath);
-            contractorList = csvImport.Contractors;
-            routeNumberList = csvImport.RouteNumbers;
+            _contractorList = csvImport.Contractors;
+            _routeNumberList = csvImport.RouteNumbers;
             ListContainer listContainer = ListContainer.GetInstance();
-            listContainer.GetLists(routeNumberList, contractorList);
+            listContainer.GetLists(_routeNumberList, _contractorList);
         }
     }
 }

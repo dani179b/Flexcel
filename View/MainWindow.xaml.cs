@@ -8,7 +8,7 @@ namespace View
     public partial class MainWindow
     {
         public readonly MainWindowViewModel MainWindowViewModel = new MainWindowViewModel();
-        public ContractorOLD Contractor = new ContractorOLD();
+        public ContractorOld Contractor = new ContractorOld();
 
         public MainWindow()
         {
@@ -18,11 +18,11 @@ namespace View
 
         private void BtnMasterDataFilePathSelect_Click(object sender, RoutedEventArgs e)
         {
-            txtBoxFilePathMasterData.Text = MainWindowViewModel.ChooseCSVFile();
+            txtBoxFilePathMasterData.Text = MainWindowViewModel.ChooseCsvFile();
         }
         private void BtnRouteNumberFilePathSelect_Click(object sender, RoutedEventArgs e)
         {
-            txtBoxFilePathRouteNumberOffer.Text = MainWindowViewModel.ChooseCSVFile();
+            txtBoxFilePathRouteNumberOffer.Text = MainWindowViewModel.ChooseCsvFile();
         }
         private void BtnImport_Click(object sender, RoutedEventArgs e)
         {
@@ -57,7 +57,7 @@ namespace View
                 ListContainer listContainer = ListContainer.GetInstance();
                 //List<Offer> outputListByUserId = listContainer.OutputList.OrderBy(x => x.UserId).ToList();
                 //listView.ItemsSource = outputListByUserId;
-                foreach (Offer offer in listContainer.OutputList)
+                foreach (Offer unused in listContainer.OutputList)
                 {
                     Contractor.CountWonOffersByType(listContainer.OutputList);
                 }
@@ -80,7 +80,7 @@ namespace View
         {
             try
             {
-                MainWindowViewModel.SaveCSVPublishFile();
+                MainWindowViewModel.SaveCsvPublishFile();
             }
             catch (Exception x)
             {
@@ -92,7 +92,7 @@ namespace View
         {
             try
             {
-                MainWindowViewModel.SaveCSVCallFile();
+                MainWindowViewModel.SaveCsvCallFile();
             }
             catch (Exception x)
             {

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Domain
 {
-    public class ContractorOLD
+    public class ContractorOld
     {
         private int _type2;
         private int _type3;
@@ -15,7 +15,7 @@ namespace Domain
         public List<Offer> InEligibleOffers;
 
         public string ReferenceNumberBasicInformationPdf { get; set; }
-        public string UserID { get; set; }
+        public string UserId { get; set; }
         public string CompanyName { get; set; }
         public string ManagerName { get; set; }
         public int NumberOfType2PledgedVehicles { get; set; }
@@ -34,25 +34,25 @@ namespace Domain
         public int NumberOfWonType6Offers { get; private set; }
         public int NumberOfWonType7Offers { get; private set; }
 
-        public ContractorOLD()
+        public ContractorOld()
         {
             WinningOffers = new List<Offer>();
             InEligibleOffers = new List<Offer>();
         }
-        public ContractorOLD(
-            string referenceNumberBasicInformationPdf, string userID, string companyName,
+        public ContractorOld(
+            string referenceNumberBasicInformationPdf, string userId, string companyName,
             string managerName, int numberOfType2PledgedVehicles, int numberOfType3PledgedVehicles, int numberOfType5PledgedVehicles,
             int numberOfType6PledgedVehicles, int numberOfType7PledgedVehicles) : this()
         {
-            this.ReferenceNumberBasicInformationPdf = referenceNumberBasicInformationPdf;
-            this.UserID = userID;
-            this.CompanyName = companyName;
-            this.ManagerName = managerName;
-            this.NumberOfType2PledgedVehicles = numberOfType2PledgedVehicles;
-            this.NumberOfType3PledgedVehicles = numberOfType3PledgedVehicles;
-            this.NumberOfType5PledgedVehicles = numberOfType5PledgedVehicles;
-            this.NumberOfType6PledgedVehicles = numberOfType6PledgedVehicles;
-            this.NumberOfType7PledgedVehicles = numberOfType7PledgedVehicles;
+            ReferenceNumberBasicInformationPdf = referenceNumberBasicInformationPdf;
+            UserId = userId;
+            CompanyName = companyName;
+            ManagerName = managerName;
+            NumberOfType2PledgedVehicles = numberOfType2PledgedVehicles;
+            NumberOfType3PledgedVehicles = numberOfType3PledgedVehicles;
+            NumberOfType5PledgedVehicles = numberOfType5PledgedVehicles;
+            NumberOfType6PledgedVehicles = numberOfType6PledgedVehicles;
+            NumberOfType7PledgedVehicles = numberOfType7PledgedVehicles;
         }
 
         public void AddWonOffer(Offer offer)
@@ -186,12 +186,13 @@ namespace Domain
                 }
             }
 
-            if (eligibleOffers > numberOfPledgedVehicles)
+            if (eligibleOffers <= numberOfPledgedVehicles) return offersWithConflict;
             {
                 if (offersToChooseFrom[numberOfPledgedVehicles - 1].ContractorPriority != offersToChooseFrom[numberOfPledgedVehicles].ContractorPriority)
                 {
                     for (int i = numberOfPledgedVehicles; i < offersToCheck.Count; i++)
                     {
+                        // ReSharper disable once CompareOfFloatsByEqualityOperator
                         if (offersToChooseFrom[i].DifferenceToNextOffer == offersToChooseFrom[numberOfPledgedVehicles - 1].DifferenceToNextOffer)
                         {
                             offersToChooseFrom[i].IsEligible = false;
@@ -200,19 +201,13 @@ namespace Domain
                 }
                 else
                 {
-                    foreach (Offer offer in offersToChooseFrom)
-                    {
-                        if (offer.DifferenceToNextOffer == offersToChooseFrom[numberOfPledgedVehicles - 1].DifferenceToNextOffer && offer.IsEligible)
-                        {
-                            offersWithConflict.Add(offer);
-                        }
-                    }
+                    // ReSharper disable once CompareOfFloatsByEqualityOperator
+                    offersWithConflict.AddRange(offersToChooseFrom.Where(offer => offer.DifferenceToNextOffer == offersToChooseFrom[numberOfPledgedVehicles - 1].DifferenceToNextOffer && offer.IsEligible));
                     if (offersWithConflict.Count == 1)
                     {
                         offersWithConflict.Clear();
                     }
                 }
-
             }
             return offersWithConflict;
         }
@@ -220,28 +215,24 @@ namespace Domain
         {
             foreach (Offer offer in outPutList)
             {
-                if (offer.UserId == UserID)
+                if (offer.UserId != UserId) continue;
+                switch (offer.RequiredVehicleType)
                 {
-                    if (offer.RequiredVehicleType == 2)
-                    {
+                    case 2:
                         NumberOfWonType2Offers++;
-                    }
-                    if (offer.RequiredVehicleType == 3)
-                    {
+                        break;
+                    case 3:
                         NumberOfWonType3Offers++;
-                    }
-                    if (offer.RequiredVehicleType == 5)
-                    {
+                        break;
+                    case 5:
                         NumberOfWonType5Offers++;
-                    }
-                    if (offer.RequiredVehicleType == 6)
-                    {
+                        break;
+                    case 6:
                         NumberOfWonType6Offers++;
-                    }
-                    if (offer.RequiredVehicleType == 7)
-                    {
+                        break;
+                    case 7:
                         NumberOfWonType7Offers++;
-                    }
+                        break;
                 }
             }
         }
